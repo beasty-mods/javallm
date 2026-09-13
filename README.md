@@ -1,0 +1,2 @@
+# javallm
+training ai model
