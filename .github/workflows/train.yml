@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       corpus_path:
-        description: "Corpus file, relative to javallm/ (e.g. data/sample_corpus.txt)"
+        description: "Corpus file, relative to the repo root (e.g. data/sample_corpus.txt)"
         required: false
         default: "data/sample_corpus.txt"
       epochs:
@@ -66,14 +66,12 @@ jobs:
         run: nproc
 
       - name: Compile the model (core) and the console UI
-        working-directory: javallm
         run: |
           mkdir -p out
           javac -encoding UTF-8 -d out core/src/main/java/com/chatllm/core/*.java
           javac -encoding UTF-8 -d out -cp out ui/src/main/java/com/chatllm/ui/*.java
 
       - name: Train
-        working-directory: javallm
         run: |
           ARGS=(
             "${{ inputs.corpus_path }}"
@@ -94,13 +92,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: model
-          path: javallm/model.bin
+          path: model.bin
 
       - name: Commit model.bin back into the repo (only if requested above)
         if: ${{ inputs.commit_model }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add javallm/model.bin
+          git add model.bin
           git commit -m "Retrain model via workflow_dispatch" || echo "No changes to commit"
           git push
