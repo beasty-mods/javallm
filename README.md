@@ -243,6 +243,35 @@ mechanism, so it will never produce GPT-quality conversation. That's the
 tradeoff for having something you can fully read, train, and understand in a
 few hundred lines of plain Java.
 
+## Train via GitHub Actions (a "Run workflow" button)
+
+If your own machine is slow and you don't want to deal with Colab, this repo
+includes `.github/workflows/train.yml`, which adds a manual **"Run workflow"**
+button that trains the model on GitHub's own cloud runners — no GPU, on
+purpose (same reasoning as above: there's no GPU code path here, and
+GitHub's free runners are CPU-only anyway). You get a real speed win because
+GitHub's CPU is a current-generation cloud core, not because of core count
+(it's still just 2 cores, same as Colab's free tier).
+
+To set it up:
+
+1. Push this whole `javallm/` project (including `.github/workflows/train.yml`)
+   to a GitHub repository.
+2. On GitHub, go to the **Actions** tab → select **"Train Chat Model"** in the
+   sidebar → click **"Run workflow"**.
+3. You'll get a form to fill in (or leave at defaults): corpus path, epochs,
+   `contextSize`, `embedDim`, `hiddenSize`, learning rate, `minFreq`, thread
+   count, and a checkbox to commit `model.bin` straight back into the repo.
+4. Click the green **"Run workflow"** button. When it finishes, either:
+   - check the box beforehand and the trained `model.bin` gets committed to
+     your repo directly, or
+   - open the finished run and download `model.bin` from the **Artifacts**
+     section at the bottom of the run page.
+
+To train on your own corpus instead of the sample one, add your `.txt` file
+under `javallm/data/` in the repo and set the `corpus_path` input to point at
+it (e.g. `data/my_corpus.txt`).
+
 ## AFK mode: two bots talking to (and training) themselves
 
 ```bash
